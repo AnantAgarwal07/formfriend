@@ -45,24 +45,28 @@
   let pendingCloudBundle = null;
 
   async function saveProfile(profile, passphrase) {
-    // 1. Encrypt & create cloud bundle
-    const bundle = await window.FormFriendCrypto.createAndSaveProfile({
-      userId: DEMO_USER_ID,
-      profile,
-      passphrase
-    });
-    
-    // 2. Upload to Cloud
-    await fetch(+ '' + ${API_URL}/profile + '' + , {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': + '' + Bearer  + '' + 
-      },
-      body: JSON.stringify(bundle)
-    });
-
-    // 3. Save plaintext to local storage for quick access by content scripts
+    try {
+      const bundle = await window.FormFriendCrypto.createAndSaveProfile({
+        userId: DEMO_USER_ID,
+        profile,
+        passphrase
+      });
+      try {
+        await fetch(API_URL + '/profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + DEMO_TOKEN
+          },
+          body: JSON.stringify(bundle)
+        });
+      } catch (e) {
+        console.warn('Cloud sync failed', e);
+      }
+    } catch(e) {
+      console.error(e);
+      alert('Crypto error: ' + e.message);
+    }
     return new Promise((resolve) => {
       chrome.storage.local.set({ [STORAGE_KEY]: profile }, resolve);
     });
@@ -77,8 +81,8 @@
   
   async function checkCloudProfile() {
     try {
-      const res = await fetch(+ '' + ${API_URL}/profile + '' + , {
-        headers: { 'Authorization': + '' + Bearer  + '' +  }
+      const res = await fetch(API_URL + '/profile', {
+        headers: { 'Authorization': 'Bearer ' + DEMO_TOKEN }
       });
       if (res.ok) {
         const data = await res.json();
@@ -661,5 +665,7 @@
 
   init();
 })();
+
+
 
 

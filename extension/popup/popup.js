@@ -40,7 +40,7 @@
   }
   // --- E2E ENCRYPTION CLOUD SYNC ---
   const DEMO_USER_ID = 'demo-user-123';
-  const API_URL = 'http://localhost:3000'; 
+  const API_URL = 'https://wp79o986m5.execute-api.ap-south-1.amazonaws.com'; 
   const DEMO_TOKEN = 'DEMO_TOKEN';
   let pendingCloudBundle = null;
 
@@ -53,7 +53,7 @@
       });
       try {
         await fetch(API_URL + '/profile', {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + DEMO_TOKEN
@@ -354,11 +354,21 @@
     // Standard fields
     for (const field of STANDARD_FIELDS) {
       const input = document.querySelector(`[name="${field}"]`);
-      if (input && profile[field] !== undefined) {
-        if (input.type === 'checkbox') {
-          input.checked = profile[field] === true || profile[field] === 'true' || profile[field] === 'yes';
-        } else {
-          input.value = profile[field];
+      if (input) {
+        let val = profile[field];
+        if (val === undefined) {
+          if (field.startsWith('family.')) {
+            val = profile[field.replace('family.', '')];
+          } else if (profile['family.' + field] !== undefined) {
+            val = profile['family.' + field];
+          }
+        }
+        if (val !== undefined) {
+          if (input.type === 'checkbox') {
+            input.checked = val === true || val === 'true' || val === 'yes';
+          } else {
+            input.value = val;
+          }
         }
       }
     }
@@ -459,6 +469,20 @@
       profile['dob_day'] = String(day).padStart(2, '0');
       profile['dob_month'] = String(month).padStart(2, '0');
       profile['dob_year'] = String(year);
+    }
+
+    // Family aliases
+    const familyFields = [
+      'father_name', 'father_occupation', 'father_phone',
+      'mother_name', 'mother_occupation', 'mother_phone',
+      'guardian_name', 'guardian_occupation', 'guardian_phone'
+    ];
+    for (const f of familyFields) {
+      if (profile[`family.${f}`]) {
+        profile[f] = profile[`family.${f}`];
+      } else if (profile[f]) {
+        profile[`family.${f}`] = profile[f];
+      }
     }
 
     return profile;
@@ -609,20 +633,34 @@
 
   document.getElementById('btn-scan-form').addEventListener('click', async () => {
     showView('scanning');
-    const response = await sendToContentScript({ type: 'START_SCAN' });
-    if (response && response.fieldCount) {
-      fieldCountEl.textContent = response.fieldCount;
-      showView('mapped');
-    } else if (response && response.error) {
-      alert(response.error);
+    try {
+      const response = await sendToContentScript({ type: 'START_SCAN' });
+      if (response && response.fieldCount !== undefined) {
+        fieldCountEl.textContent = response.fieldCount;
+        showView('mapped');
+      } else if (response && response.error) {
+        alert(response.error);
+        showView('profileReady');
+      } else {
+        alert('Could not scan form fields. Please ensure you are on a webpage with form inputs and try reloading the page.');
+        showView('profileReady');
+      }
+    } catch (err) {
+      alert('Scanning failed: ' + (err.message || err));
       showView('profileReady');
     }
   });
 
   document.getElementById('btn-review-fill').addEventListener('click', async () => {
-    const response = await sendToContentScript({ type: 'START_REVIEW' });
-    if (response && response.filled) {
-      showView('filled');
+    try {
+      const response = await sendToContentScript({ type: 'START_REVIEW' });
+      if (response && response.filled) {
+        showView('filled');
+      } else if (response && response.error) {
+        alert(response.error);
+      }
+    } catch (err) {
+      alert('Review & fill error: ' + (err.message || err));
     }
     window.close();
   });

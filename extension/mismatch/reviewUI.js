@@ -78,10 +78,14 @@ var FormFriendReviewUI = (function () {
 
   function formatPersonLabel(person) {
     if (person === 'self') return 'Applicant Information';
+    if (person === 'father') return "Father's Information";
+    if (person === 'mother') return "Mother's Information";
+    if (person === 'guardian' || person === 'parentGuardian') return 'Parent / Guardian Information';
     if (person === 'coApplicant') return 'Co-Applicant Information';
-    if (person === 'parentGuardian') return 'Parent / Guardian Information';
     if (person === 'emergencyContact') return 'Emergency Contact Information';
-    return 'Unknown Information';
+    if (person === 'spouse') return "Spouse's Information";
+    if (person) return (person.charAt(0).toUpperCase() + person.slice(1)) + ' Information';
+    return 'Other Information';
   }
 
   /**

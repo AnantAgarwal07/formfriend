@@ -198,22 +198,24 @@ var FormFriendMain = (function () {
       'category.disability_percentage': ['disability_percentage'],
 
       // Family
-      'father_name': ['family.father_name'],
-      'family.father_name': ['father_name'],
-      'father_occupation': ['family.father_occupation'],
-      'family.father_occupation': ['father_occupation'],
-      'father_phone': ['family.father_phone'],
-      'family.father_phone': ['father_phone'],
-      'mother_name': ['family.mother_name'],
-      'family.mother_name': ['mother_name'],
-      'mother_occupation': ['family.mother_occupation'],
-      'family.mother_occupation': ['mother_occupation'],
-      'mother_phone': ['family.mother_phone'],
-      'family.mother_phone': ['mother_phone'],
-      'guardian_name': ['family.guardian_name'],
-      'family.guardian_name': ['guardian_name'],
-      'guardian_occupation': ['family.guardian_occupation'],
-      'family.guardian_occupation': ['guardian_occupation'],
+      'father_name': ['family.father_name', 'fatherName', 'father_fullName'],
+      'family.father_name': ['father_name', 'fatherName'],
+      'father_occupation': ['family.father_occupation', 'fatherOccupation'],
+      'family.father_occupation': ['father_occupation', 'fatherOccupation'],
+      'father_phone': ['family.father_phone', 'fatherPhone', 'father_mobile'],
+      'family.father_phone': ['father_phone', 'fatherPhone', 'father_mobile'],
+      'mother_name': ['family.mother_name', 'motherName', 'mother_fullName'],
+      'family.mother_name': ['mother_name', 'motherName'],
+      'mother_occupation': ['family.mother_occupation', 'motherOccupation'],
+      'family.mother_occupation': ['mother_occupation', 'motherOccupation'],
+      'mother_phone': ['family.mother_phone', 'motherPhone', 'mother_mobile'],
+      'family.mother_phone': ['mother_phone', 'motherPhone', 'mother_mobile'],
+      'guardian_name': ['family.guardian_name', 'guardianName'],
+      'family.guardian_name': ['guardian_name', 'guardianName'],
+      'guardian_occupation': ['family.guardian_occupation', 'guardianOccupation'],
+      'family.guardian_occupation': ['guardian_occupation', 'guardianOccupation'],
+      'guardian_phone': ['family.guardian_phone', 'guardianPhone', 'guardian_mobile'],
+      'family.guardian_phone': ['guardian_phone', 'guardianPhone', 'guardian_mobile'],
 
       // Education
       'highest_qualification': ['education.highest_qualification', 'education'],
@@ -310,11 +312,37 @@ var FormFriendMain = (function () {
       let value = undefined;
 
       // 2. Profile Value Resolution
-      if (person === 'self') {
-        value = getProfileValue(profile, entry.profileField, element);
+      // First attempt to resolve using direct profile field or its standard aliases
+      value = getProfileValue(profile, entry.profileField, element);
 
-        // Missing Info Flow for Self
-        if (!value) {
+      // If third-party context (father, mother, guardian, etc.) and not yet resolved:
+      if (!value && person !== 'self') {
+        const cleanField = entry.profileField.replace(new RegExp(`^${person}_?`, 'i'), '');
+        const candidateKeys = [
+          `${person}_${cleanField}`,
+          `family.${person}_${cleanField}`,
+          `${person}_${entry.profileField}`,
+          `family.${entry.profileField}`,
+          `family.${person}_name`
+        ];
+
+        if (['name', 'full_name', 'first_name', 'last_name'].includes(cleanField) || cleanField === '') {
+          candidateKeys.unshift(`${person}_name`, `family.${person}_name`);
+        } else if (['occupation', 'profession'].includes(cleanField)) {
+          candidateKeys.unshift(`${person}_occupation`, `family.${person}_occupation`);
+        } else if (['phone', 'mobile', 'phone_number'].includes(cleanField)) {
+          candidateKeys.unshift(`${person}_phone`, `family.${person}_phone`);
+        }
+
+        for (const key of candidateKeys) {
+          value = getProfileValue(profile, key, element);
+          if (value) break;
+        }
+      }
+
+      // If still no value, check if user should be prompted for missing required info
+      if (!value) {
+        if (person === 'self') {
           // Conditional skip: if candidate is not PwD, do not prompt for disability details
           const isDisability = entry.profileField.includes('disability');
           const isNonPwd = profile['category.pwd'] === 'No' || profile.pwd === 'No' || profile['category.pwd'] === 'no' || profile['category.pwd'] === false;
@@ -335,27 +363,24 @@ var FormFriendMain = (function () {
             profile[entry.profileField] = value;
             await FormFriendProfile.updateProfile({ [entry.profileField]: value });
           }
-        }
-      } else {
-        // Third-party Information Flow (Father, Mother, Guardian, Emergency Contact)
-        const thirdPartyField = person + '_' + entry.profileField;
-        value = profile[thirdPartyField];
-
-        // If not in profile, only prompt if required
-        if (!value) {
+        } else {
+          // Third-party missing info
           const isRequired = element.required || element.getAttribute('aria-required') === 'true';
           if (!isRequired) {
             continue;
           }
 
-          const result = await FormFriendReviewUI.showMissingInfoPrompt(label, person + '\\''s information', true);
+          const saveKey = entry.profileField.includes(person) ? entry.profileField : `${person}_${entry.profileField}`;
+          const result = await FormFriendReviewUI.showMissingInfoPrompt(label, `${person}'s information`, true);
           if (result.action === 'skip') continue;
           value = result.value;
           if (result.action === 'save' && value) {
-            profile[thirdPartyField] = value;
-            await FormFriendProfile.updateProfile({ [thirdPartyField]: value });
-          }
-        });
+            profile[saveKey] = value;
+            profile[`family.${saveKey}`] = value;
+            await FormFriendProfile.updateProfile({
+              [saveKey]: value,
+              [`family.${saveKey}`]: value
+            });
           }
         }
       }

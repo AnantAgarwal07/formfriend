@@ -134,8 +134,13 @@ var FormFriendMismatchDetector = (function () {
       'college': ['education.college'],
       'degree': ['education.degree', 'course'],
       'branch': ['education.branch', 'department'],
-      'father_name': ['family.father_name'],
-      'mother_name': ['family.mother_name']
+      'father_name': ['family.father_name', 'fatherName'],
+      'father_occupation': ['family.father_occupation', 'fatherOccupation'],
+      'father_phone': ['family.father_phone', 'fatherPhone', 'father_mobile'],
+      'mother_name': ['family.mother_name', 'motherName'],
+      'mother_occupation': ['family.mother_occupation', 'motherOccupation'],
+      'mother_phone': ['family.mother_phone', 'motherPhone', 'mother_mobile'],
+      'guardian_name': ['family.guardian_name', 'guardianName']
     };
 
     const alts = ALIASES[profileField] || [];

@@ -27,6 +27,7 @@
                                            "intelligence/normalize.js",
                                            "vault/profileStorage.js",
                                            "content/fieldRegistry.js",
+                                           "content/scannerStub.js",
                                            "autofill/autofill.js",
                                            "mismatch/mismatchDetector.js",
                                            "mismatch/reviewUI.js",

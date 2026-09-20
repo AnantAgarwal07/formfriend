@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             try {
               // Ensure FormFriendAPI is accessible in background (needs importScripts in manifest)
               // If not, this logic can just use fetch directly or rely on api.js being loaded
-              const apiResponse = await fetch(`http://wp79o986m5.execute-api.ap-south-1.amazonaws.com/intelligence/resolve`, {
+              const apiResponse = await fetch(`https://wp79o986m5.execute-api.ap-south-1.amazonaws.com/intelligence/resolve`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -140,7 +140,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]) {
           chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
-            sendResponse(response || { ok: true });
+            if (chrome.runtime.lastError) {
+              console.warn('[FormFriend] Error communicating with content script:', chrome.runtime.lastError.message);
+              sendResponse({ ok: false, error: 'Could not connect to page. Please refresh the page and try again.' });
+              return;
+            }
+            sendResponse(response || { ok: false, error: 'No response from page' });
           });
         } else {
           sendResponse({ ok: false, error: 'No active tab' });

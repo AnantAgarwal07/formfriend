@@ -1,0 +1,47 @@
+{
+    "manifest_version":  3,
+    "name":  "FormFriend",
+    "version":  "1.0.0",
+    "description":  "Intelligent form filler with mismatch detection. Stores your profile locally and warns about discrepancies.",
+    "permissions":  [
+                        "storage",
+                        "activeTab"
+                    ],
+    "background":  {
+                       "service_worker":  "background/background.js"
+                   },
+    "action":  {
+                   "default_popup":  "popup/popup.html",
+                   "default_icon":  {
+                                        "16":  "icons/icon16.png",
+                                        "48":  "icons/icon48.png",
+                                        "128":  "icons/icon128.png"
+                                    }
+               },
+    "content_scripts":  [
+                            {
+                                "matches":  [
+                                                "<all_urls>"
+                                            ],
+                                "js":  [
+                                           "intelligence/normalize.js",
+                                           "vault/profileStorage.js",
+                                           "content/fieldRegistry.js",
+                                           "autofill/autofill.js",
+                                           "mismatch/mismatchDetector.js",
+                                           "mismatch/reviewUI.js",
+                                           "mismatch/mismatchUI.js",
+                                           "content/main.js"
+                                       ],
+                                "css":  [
+                                            "mismatch/reviewUI.css"
+                                        ],
+                                "run_at":  "document_idle"
+                            }
+                        ],
+    "icons":  {
+                  "16":  "icons/icon16.png",
+                  "48":  "icons/icon48.png",
+                  "128":  "icons/icon128.png"
+              }
+}

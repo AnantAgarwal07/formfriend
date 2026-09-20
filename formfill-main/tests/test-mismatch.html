@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FormFriend — Mismatch Detection Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #fafafa; }
+    h1 { font-family: sans-serif; color: #4361ee; margin-bottom: 16px; }
+    .pass { color: #2e7d32; padding: 4px 8px; }
+    .fail { color: #c62828; padding: 4px 8px; font-weight: bold; }
+    .summary { font-size: 18px; font-weight: bold; padding: 12px; border-bottom: 2px solid #ddd; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Mismatch Detection Tests</h1>
+  <div id="results"></div>
+
+  <!-- Load dependencies in order -->
+  <script src="../src/utils/normalize.js"></script>
+  <script src="../src/content/fieldRegistry.js"></script>
+  <script src="../src/content/mismatchDetector.js"></script>
+
+  <script>
+    let passed = 0, failed = 0;
+    function assert(condition, name) {
+      const div = document.createElement('div');
+      if (condition) {
+        div.className = 'pass';
+        div.textContent = '✓ ' + name;
+        passed++;
+      } else {
+        div.className = 'fail';
+        div.textContent = '✗ ' + name;
+        failed++;
+      }
+      document.getElementById('results').appendChild(div);
+    }
+    function done() {
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.style.color = failed > 0 ? '#c62828' : '#2e7d32';
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      document.getElementById('results').prepend(summary);
+    }
+
+    const D = FormFriendMismatchDetector;
+
+    // --- compareField tests ---
+
+    // Names
+    let r = D.compareField('Anant Agarwal', 'Anant Agarwal', 'fullName');
+    assert(r.type === 'match', 'Name exact match');
+
+    r = D.compareField('Anant Agarwal', 'anant agarwal', 'fullName');
+    assert(r.type === 'format_difference', 'Name case difference → format_difference');
+
+    r = D.compareField('Anant Agarwal', 'Anant Aggarwal', 'fullName');
+    assert(r.type === 'possible_typo', 'Name typo (Agarwal vs Aggarwal) → possible_typo');
+
+    r = D.compareField('Anant Agarwal', '  Anant  Agarwal  ', 'fullName');
+    assert(r.type === 'format_difference', 'Name whitespace difference → format_difference');
+
+    r = D.compareField('Anant Agarwal', 'John Smith', 'fullName');
+    assert(r.type === 'mismatch', 'Name completely different → mismatch');
+
+    // Severity check
+    r = D.compareField('Anant Agarwal', 'John Smith', 'fullName');
+    assert(r.severity === 'high', 'Name mismatch severity → high');
+
+    r = D.compareField('Anant Agarwal', 'Anant Aggarwal', 'fullName');
+    assert(r.severity === 'medium', 'Name typo severity → medium');
+
+    // Email
+    r = D.compareField('anant@example.com', 'Anant@Example.COM', 'email');
+    assert(r.type === 'format_difference', 'Email case diff → format_difference');
+
+    r = D.compareField('anant@example.com', 'other@example.com', 'email');
+    assert(r.type === 'mismatch', 'Email different → mismatch');
+
+    // Phone
+    r = D.compareField('+91 9876543210', '9876543210', 'phone');
+    assert(r.type === 'format_difference', 'Phone country code diff → format_difference');
+
+    r = D.compareField('+91 9876543210', '919876543210', 'phone');
+    assert(r.type === 'format_difference', 'Phone formatting diff → format_difference');
+
+    r = D.compareField('+91 9876543210', '1234567890', 'phone');
+    assert(r.type === 'mismatch', 'Phone different → mismatch');
+
+    // Date
+    r = D.compareField('22/05/2007', '2007-05-22', 'dateOfBirth');
+    assert(r.type === 'format_difference', 'Date format diff → format_difference');
+
+    r = D.compareField('22/05/2007', '22/05/2006', 'dateOfBirth');
+    assert(r.type === 'mismatch', 'Date wrong year → mismatch');
+
+    r = D.compareField('22/05/2007', '22-05-2007', 'dateOfBirth');
+    assert(r.type === 'format_difference', 'Date separator diff → format_difference');
+
+    // Edge cases
+    r = D.compareField('', 'some value', 'fullName');
+    assert(r.type === 'unknown', 'Empty profile value → unknown');
+
+    r = D.compareField('some value', '', 'fullName');
+    assert(r.type === 'unknown', 'Empty form value → unknown');
+
+    r = D.compareField(null, 'value', 'fullName');
+    assert(r.type === 'unknown', 'Null profile value → unknown');
+
+    // Generic text
+    r = D.compareField('CUSAT', 'cusat', 'college');
+    assert(r.type === 'format_difference', 'Generic text case diff → format_difference');
+
+    r = D.compareField('CUSAT', 'IIT Delhi', 'college');
+    assert(r.type === 'mismatch', 'Generic text different → mismatch');
+
+    // --- getWarnings ---
+    const warnings = D.getWarnings([
+      { type: 'match', severity: 'none' },
+      { type: 'format_difference', severity: 'none' },
+      { type: 'possible_typo', severity: 'medium' },
+      { type: 'mismatch', severity: 'high' },
+      { type: 'unknown', severity: 'medium' }
+    ]);
+    assert(warnings.length === 3, 'getWarnings: filters to possible_typo + mismatch + unknown');
+    assert(warnings[0].type === 'possible_typo', 'getWarnings: includes possible_typo');
+    assert(warnings[1].type === 'mismatch', 'getWarnings: includes mismatch');
+    assert(warnings[2].type === 'unknown', 'getWarnings: includes unknown');
+
+    // --- getFieldCategory ---
+    assert(D.getFieldCategory('fullName') === 'name', 'getFieldCategory: fullName → name');
+    assert(D.getFieldCategory('email') === 'email', 'getFieldCategory: email → email');
+    assert(D.getFieldCategory('phone') === 'phone', 'getFieldCategory: phone → phone');
+    assert(D.getFieldCategory('dateOfBirth') === 'date', 'getFieldCategory: dateOfBirth → date');
+    assert(D.getFieldCategory('college') === 'text', 'getFieldCategory: college → text');
+
+    done();
+  </script>
+</body>
+</html>

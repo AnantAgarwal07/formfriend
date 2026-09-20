@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "description": "Canonical profile classes that FormFriend is allowed to fill.",
+  "classes": [
+    {
+      "id": "name",
+      "description": "The user's own name, including full name or legal name.",
+      "examples": ["Name", "Full Name", "Full Legal Name", "Applicant Name"]
+    },
+    {
+      "id": "age",
+      "description": "The user's age in years.",
+      "examples": ["Age", "How old are you?", "Years old"]
+    },
+    {
+      "id": "gender",
+      "description": "The user's gender.",
+      "examples": ["Gender", "Sex"]
+    },
+    {
+      "id": "dob",
+      "description": "The user's date of birth.",
+      "examples": ["Date of Birth", "DOB", "Birth Date"]
+    },
+    {
+      "id": "email",
+      "description": "The user's email address.",
+      "examples": ["Email", "Email Address", "E-mail"]
+    },
+    {
+      "id": "phone",
+      "description": "The user's phone or mobile number.",
+      "examples": ["Phone", "Mobile Number", "Contact Number"]
+    },
+    {
+      "id": "address",
+      "description": "The user's residential or postal address.",
+      "examples": ["Address", "Home Address", "Postal Address"]
+    }
+  ]
+}

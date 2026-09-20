@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "FormFriend",
+  "version": "1.0.0",
+  "description": "Intelligent form filler with mismatch detection. Stores your profile locally and warns about discrepancies.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/utils/normalize.js",
+        "src/storage/profileStorage.js",
+        "src/content/fieldRegistry.js",
+        "src/content/autofill.js",
+        "src/content/mismatchDetector.js",
+        "src/content/reviewUI.js",
+        "src/content/mismatchUI.js",
+        "src/content/scannerStub.js",
+        "src/content/main.js"
+      ],
+      "css": [
+        "src/content/reviewUI.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Details</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7ff;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      color: #1a1a2e;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px;
+      width: 100%;
+      max-width: 520px;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; color: #4361ee; }
+    .subtitle { color: #888; font-size: 14px; margin-bottom: 16px; }
+    .warning-banner {
+      background: #fff3e0;
+      border: 1px solid #ffe0b2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #ef6c00;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-group { margin-bottom: 20px; }
+    label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #555; margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    input {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; color: #1a1a2e; transition: border-color 0.15s;
+    }
+    input:focus {
+      outline: none; border-color: #4361ee;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    button[type="submit"] {
+      width: 100%; padding: 12px;
+      background: #4361ee; color: white; border: none;
+      border-radius: 8px; font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-top: 8px;
+    }
+    button[type="submit"]:hover { background: #3a56d4; }
+    .result {
+      margin-top: 24px; padding: 16px; background: #e8f5e9;
+      border-radius: 8px; font-size: 13px; display: none;
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .badge {
+      display: inline-block; background: #fce4ec; color: #c62828;
+      padding: 4px 10px; border-radius: 12px; font-size: 11px;
+      font-weight: 600; margin-bottom: 16px;
+    }
+    .note {
+      margin-top: 24px; padding: 16px; background: #f3e5f5;
+      border-radius: 8px; font-size: 12px; color: #7b1fa2;
+      line-height: 1.6;
+    }
+    .note strong { display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Verify Your Details</h1>
+    <p class="subtitle">Demo 3 — Pre-filled with incorrect values for mismatch testing</p>
+    <span class="badge">Mismatch Test</span>
+
+    <div class="warning-banner">
+      ⚠️ Please verify the following pre-filled information is correct before submitting.
+    </div>
+
+    <form id="verify-form">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" name="fullName" value="Anant Aggarwal">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="anant@example.com">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" value="+91 9876543210">
+      </div>
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="text" id="dob" name="dateOfBirth" value="22/05/2006">
+      </div>
+      <div class="form-group">
+        <label for="college">College</label>
+        <input type="text" id="college" name="college" value="CUSAT">
+      </div>
+      <button type="submit">Confirm & Submit</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <div class="note">
+      <strong>🧪 Test Guide</strong>
+      With the profile set to:<br>
+      • Name: <b>Anant Agarwal</b> (single 'g')<br>
+      • DOB: <b>22/05/2007</b> (year 2007)<br><br>
+      FormFriend should detect:<br>
+      • ⚠ Name: "Aggarwal" vs "Agarwal" → <b>possible_typo</b><br>
+      • ⚠ DOB: "22/05/2006" vs "22/05/2007" → <b>mismatch</b>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('verify-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = {};
+      for (const el of e.target.elements) {
+        if (el.name) data[el.name] = el.value;
+      }
+      const resultEl = document.getElementById('result');
+      resultEl.style.display = 'block';
+      resultEl.textContent = '✓ Submitted with values:\n\n' + JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>

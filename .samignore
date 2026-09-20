@@ -1,0 +1,12 @@
+.aws-sam/
+.env*
+.git/
+node_modules/
+formfill-main/
+formfriend-clientside-crypto-main/
+Formfriend-llm-fallback-main/
+tests/
+postman/
+test-html-mappings.js
+update-postman.js
+README.md

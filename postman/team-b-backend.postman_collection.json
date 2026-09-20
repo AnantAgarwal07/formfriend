@@ -1,0 +1,377 @@
+{
+  "info": {
+    "name": "FormFriend Team B Backend",
+    "description": "Complete API collection for Team B Backend — Auth (Cognito) + Encrypted Profile Storage + Redis Cache",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "idToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints (public — no token required)",
+      "item": [
+        {
+          "name": "1. Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"Demo@12345\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Confirm Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "confirm"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"code\": \"123456\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-extract tokens from login response",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.idToken) {",
+                  "        pm.collectionVariables.set('idToken', body.idToken);",
+                  "        console.log('✅ idToken saved to collection variables');",
+                  "    }",
+                  "    if (body.accessToken) {",
+                  "        pm.collectionVariables.set('accessToken', body.accessToken);",
+                  "        console.log('✅ accessToken saved to collection variables');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"Demo@12345\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "description": "Profile endpoints (protected — requires Bearer token from login)",
+      "item": [
+        {
+          "name": "4. Save Profile (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rounak\",\n  \"age\": 20,\n  \"dob\": \"2006-01-01\",\n  \"email\": \"demo@example.com\",\n  \"phone\": \"9999999999\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Profile (GET) — first call = Redis MISS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Profile (GET) — second call = Redis HIT",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Update Profile (PUT) — verify no stale cache",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rounak Updated\",\n  \"age\": 21,\n  \"dob\": \"2006-01-01\",\n  \"email\": \"demo@example.com\",\n  \"phone\": \"8888888888\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Profile (GET) — after update, should show new data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "description": "Health check (public)",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Intelligence Resolve",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/intelligence/resolve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "intelligence",
+            "resolve"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"formFingerprint\": \"demo-registration-001\",\n  \"field\": {\n    \"fieldId\": \"f1\",\n    \"label\": \"Father's Full Name\",\n    \"section\": \"Parent Details\",\n    \"fieldset\": \"Parent Details\",\n    \"headings\": [\n      \"Application Form\"\n    ],\n    \"placeholder\": \"\",\n    \"autocomplete\": \"\",\n    \"name\": \"fatherName\",\n    \"id\": \"fatherName\",\n    \"tag\": \"input\",\n    \"type\": \"text\"\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "10. Intelligence Feedback",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/intelligence/feedback",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "intelligence",
+            "feedback"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mappingId\": \"seed_map_0\",\n  \"accepted\": true,\n  \"correctProfileField\": \"parent.father.name\"\n}"
+        }
+      }
+    },
+    {
+      "name": "11. Intelligence Metrics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/intelligence/metrics",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "intelligence",
+            "metrics"
+          ]
+        }
+      }
+    }
+  ]
+}

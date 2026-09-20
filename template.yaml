@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  FormFriend Team B Backend — Authentication, encrypted profile storage,
+  and Redis-cached retrieval via Lambda + API Gateway + DynamoDB.
+
+# ─────────────────────────────────────────────────
+# Parameters — supply these at deploy time
+# ─────────────────────────────────────────────────
+Parameters:
+  CognitoUserPoolId:
+    Type: String
+    Description: Cognito User Pool ID (e.g. ap-south-1_XXXXXXXXX)
+  CognitoClientId:
+    Type: String
+    Description: Cognito App Client ID (public, no secret)
+  ProfilesTableName:
+    Type: String
+    Default: 'Profiles'
+    Description: Name of the existing DynamoDB table for profiles
+  UpstashRedisRestUrl:
+    Type: String
+    Description: Upstash Redis REST URL
+  UpstashRedisRestToken:
+    Type: String
+    Description: Upstash Redis REST Token
+    NoEcho: true
+  EncryptionKeyB64:
+    Type: String
+    Description: AES-256 key, Base64-encoded (32 bytes)
+    NoEcho: true
+  RedisProfileTtlSeconds:
+    Type: Number
+    Default: 3600
+    Description: TTL in seconds for cached profiles in Redis
+  CorsOrigin:
+    Type: String
+    Default: '*'
+    Description: Allowed CORS origin
+  GeminiApiKey:
+    Type: String
+    Default: ''
+    Description: Google Gemini API Key for LLM fallback
+    NoEcho: true
+  GeminiModel:
+    Type: String
+    Default: 'gemini-2.5-flash-lite'
+    Description: Gemini model ID
+
+# ─────────────────────────────────────────────────
+# Globals
+# ─────────────────────────────────────────────────
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs20.x
+    MemorySize: 256
+
+# ─────────────────────────────────────────────────
+# Resources
+# ─────────────────────────────────────────────────
+Resources:
+
+
+  # ── Form Semantic Cache Table ─────────────────
+  FormSemanticCacheTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FormSemanticCache
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: mappingId
+          AttributeType: S
+        - AttributeName: semanticKey
+          AttributeType: S
+        - AttributeName: formFingerprint
+          AttributeType: S
+      KeySchema:
+        - AttributeName: mappingId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: SemanticKeyIndex
+          KeySchema:
+            - AttributeName: semanticKey
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: FormFingerprintIndex
+          KeySchema:
+            - AttributeName: formFingerprint
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  # ── API Gateway HTTP API ──────────────────────
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref CorsOrigin
+        AllowMethods:
+          - GET
+          - PUT
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        MaxAge: 600
+
+  # ── Lambda Function ───────────────────────────
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: formfriend-backend
+      CodeUri: .
+      Handler: src/lambda.handler
+      Environment:
+        Variables:
+          NODE_ENV: production
+          AWS_REGION_OVERRIDE: !Ref AWS::Region
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_CLIENT_ID: !Ref CognitoClientId
+          DYNAMODB_TABLE_NAME: !Ref ProfilesTableName
+          UPSTASH_REDIS_REST_URL: !Ref UpstashRedisRestUrl
+          UPSTASH_REDIS_REST_TOKEN: !Ref UpstashRedisRestToken
+          REDIS_PROFILE_TTL_SECONDS: !Ref RedisProfileTtlSeconds
+          ENCRYPTION_KEY_B64: !Ref EncryptionKeyB64
+          CORS_ORIGIN: !Ref CorsOrigin
+          SEMANTIC_CACHE_TABLE_NAME: !Ref FormSemanticCacheTable
+          SEMANTIC_CACHE_TTL_SECONDS: 86400
+          SEMANTIC_EMBEDDINGS_ENABLED: 'false'
+          BEDROCK_REGION: 'ap-south-1'
+          BEDROCK_EMBEDDING_MODEL_ID: 'amazon.titan-embed-text-v1'
+          LLM_PROVIDER: 'none'
+          GEMINI_API_KEY: !Ref GeminiApiKey
+          GEMINI_MODEL: !Ref GeminiModel
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProfilesTableName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FormSemanticCacheTable
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+# ─────────────────────────────────────────────────
+# Outputs
+# ─────────────────────────────────────────────────
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  ProfilesTableName:
+    Description: DynamoDB table name
+    Value: !Ref ProfilesTableName
+  LambdaFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt BackendFunction.Arn

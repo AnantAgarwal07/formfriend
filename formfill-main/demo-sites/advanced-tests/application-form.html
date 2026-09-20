@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Application Form</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; font-size: 16px; background: #f5f5f5; }
+    form { max-width: 800px; margin: 0 auto; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 6px; }
+    fieldset { margin: 0 0 20px; padding: 16px; border: 1px solid #ccc; border-radius: 4px; }
+    legend { padding: 0 8px; font-weight: 600; font-size: 1.05rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 16px; }
+    .field { display: flex; flex-direction: column; }
+    .field.full { grid-column: 1 / -1; }
+    label { margin-bottom: 4px; font-size: 0.9rem; font-weight: 500; }
+    input, select, textarea { width: 100%; padding: 9px 10px; font: inherit; background: #fff; border: 1px solid #aaa; border-radius: 4px; }
+    button[type="submit"] { display: block; padding: 12px; font: inherit; font-weight: 600; color: #fff; background: #1a5fb4; border: 0; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <form action="#" method="post" enctype="multipart/form-data">
+    <h1>Application Form</h1>
+    <p class="intro">Fill in the details below. Fields are grouped by section.</p>
+
+    <!-- PERSONAL -->
+    <fieldset>
+      <legend>Personal Information</legend>
+      <div class="grid">
+        <div class="field full">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="dob">Date of birth</label>
+          <input type="date" id="dob" name="dob" autocomplete="bday">
+        </div>
+        <div class="field">
+          <label for="age">Age (years)</label>
+          <input type="number" id="age" name="age" min="0" max="120">
+        </div>
+        <div class="field">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender">
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nationality">Nationality</label>
+          <input type="text" id="nationality" name="nationality">
+        </div>
+        <div class="field">
+          <label for="birth_place">Place of birth</label>
+          <input type="text" id="birth_place" name="birth_place">
+        </div>
+        <div class="field">
+          <label for="birth_state">State of birth</label>
+          <input type="text" id="birth_state" name="birth_state">
+        </div>
+        <div class="field">
+          <label for="religion">Religion</label>
+          <input type="text" id="religion" name="religion">
+        </div>
+        <div class="field">
+          <label for="mother_tongue">Mother tongue</label>
+          <input type="text" id="mother_tongue" name="mother_tongue">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- CONTACT -->
+    <fieldset>
+      <legend>Contact Information</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="alternate_email">Alternate email address</label>
+          <input type="email" id="alternate_email" name="alternate_email">
+        </div>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="alternate_phone">Alternate phone number</label>
+          <input type="tel" id="alternate_phone" name="alternate_phone">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ADDRESS -->
+    <fieldset>
+      <legend>Address</legend>
+      <div class="grid">
+        <div class="field full">
+          <label for="address">Complete address</label>
+          <textarea id="address" name="address" rows="3" autocomplete="street-address"></textarea>
+        </div>
+        <div class="field">
+          <label for="address_line_1">Address line 1</label>
+          <input type="text" id="address_line_1" name="address_line_1" autocomplete="address-line1">
+        </div>
+        <div class="field">
+          <label for="address_line_2">Address line 2</label>
+          <input type="text" id="address_line_2" name="address_line_2" autocomplete="address-line2">
+        </div>
+        <div class="field">
+          <label for="locality">Locality / village / area</label>
+          <input type="text" id="locality" name="locality">
+        </div>
+        <div class="field">
+          <label for="city">City / town</label>
+          <input type="text" id="city" name="city" autocomplete="address-level2">
+        </div>
+        <div class="field">
+          <label for="district">District</label>
+          <input type="text" id="district" name="district">
+        </div>
+        <div class="field">
+          <label for="state">State / UT</label>
+          <input type="text" id="state" name="state" autocomplete="address-level1">
+        </div>
+        <div class="field">
+          <label for="country">Country</label>
+          <input type="text" id="country" name="country" autocomplete="country-name">
+        </div>
+        <div class="field">
+          <label for="pincode">PIN code</label>
+          <input type="text" id="pincode" name="pincode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="postal-code">
+          <span class="hint">6 digits</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- IDENTITY -->
+    <fieldset>
+      <legend>Identity</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="identity_document">Identity document type</label>
+          <select id="identity_document" name="identity_document">
+            <option value="">Select</option>
+            <option value="aadhaar">Aadhaar</option>
+            <option value="pan">PAN Card</option>
+            <option value="passport">Passport</option>
+            <option value="voter_id">Voter ID</option>
+            <option value="driving_licence">Driving Licence</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="aadhaar">Aadhaar number</label>
+          <input type="text" id="aadhaar" name="aadhaar" inputmode="numeric" pattern="[0-9]{12}" maxlength="12">
+          <span class="hint">12 digits</span>
+        </div>
+        <div class="field">
+          <label for="pan">PAN number</label>
+          <input type="text" id="pan" name="pan" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" maxlength="10">
+          <span class="hint">Example: ABCDE1234F</span>
+        </div>
+        <div class="field">
+          <label for="passport">Passport number</label>
+          <input type="text" id="passport" name="passport">
+        </div>
+        <div class="field">
+          <label for="registration_number">Registration / enrollment number</label>
+          <input type="text" id="registration_number" name="registration_number">
+        </div>
+        <div class="field">
+          <label for="candidate_id">Candidate ID</label>
+          <input type="text" id="candidate_id" name="candidate_id">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- CATEGORY & RESERVATION -->
+    <fieldset>
+      <legend>Category and Reservation</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option value="">Select</option>
+            <option value="general">General</option>
+            <option value="ews">EWS</option>
+            <option value="obc">OBC</option>
+            <option value="sc">SC</option>
+            <option value="st">ST</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="subcategory">Sub category</label>
+          <input type="text" id="subcategory" name="subcategory">
+        </div>
+        <div class="field">
+          <label for="ews">Economically Weaker Section (EWS)</label>
+          <select id="ews" name="ews">
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="obc_status">OBC status</label>
+          <select id="obc_status" name="obc_status">
+            <option value="">Select</option>
+            <option value="non_creamy_layer">Non-Creamy Layer</option>
+            <option value="creamy_layer">Creamy Layer</option>
+            <option value="not_applicable">Not applicable</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pwd">Person with Disability (PwD)</label>
+          <select id="pwd" name="pwd">
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="disability_type">Type of disability</label>
+          <input type="text" id="disability_type" name="disability_type">
+        </div>
+        <div class="field">
+          <label for="disability_percentage">Disability percentage</label>
+          <input type="number" id="disability_percentage" name="disability_percentage" min="0" max="100" step="0.01">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- FAMILY -->
+    <fieldset>
+      <legend>Family Details</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="father_name">Father's name</label>
+          <input type="text" id="father_name" name="father_name">
+        </div>
+        <div class="field">
+          <label for="father_occupation">Father's occupation</label>
+          <input type="text" id="father_occupation" name="father_occupation">
+        </div>
+        <div class="field">
+          <label for="father_phone">Father's phone number</label>
+          <input type="tel" id="father_phone" name="father_phone">
+        </div>
+        <div class="field">
+          <label for="mother_name">Mother's name</label>
+          <input type="text" id="mother_name" name="mother_name">
+        </div>
+        <div class="field">
+          <label for="mother_occupation">Mother's occupation</label>
+          <input type="text" id="mother_occupation" name="mother_occupation">
+        </div>
+        <div class="field">
+          <label for="mother_phone">Mother's phone number</label>
+          <input type="tel" id="mother_phone" name="mother_phone">
+        </div>
+        <div class="field">
+          <label for="guardian_name">Guardian's name</label>
+          <input type="text" id="guardian_name" name="guardian_name">
+        </div>
+        <div class="field">
+          <label for="guardian_occupation">Guardian's occupation</label>
+          <input type="text" id="guardian_occupation" name="guardian_occupation">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- EDUCATION -->
+    <fieldset>
+      <legend>Education</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="qualification">Highest qualification</label>
+          <input type="text" id="qualification" name="qualification">
+        </div>
+        <div class="field">
+          <label for="degree">Degree / program</label>
+          <input type="text" id="degree" name="degree">
+        </div>
+        <div class="field">
+          <label for="branch">Branch / specialization</label>
+          <input type="text" id="branch" name="branch">
+        </div>
+        <div class="field">
+          <label for="college">College / institution</label>
+          <input type="text" id="college" name="college">
+        </div>
+        <div class="field">
+          <label for="university">University</label>
+          <input type="text" id="university" name="university">
+        </div>
+        <div class="field">
+          <label for="school">School name</label>
+          <input type="text" id="school" name="school">
+        </div>
+        <div class="field">
+          <label for="board">Board</label>
+          <input type="text" id="board" name="board">
+        </div>
+        <div class="field">
+          <label for="roll_number">Roll number</label>
+          <input type="text" id="roll_number" name="roll_number">
+        </div>
+        <div class="field">
+          <label for="graduation_year">Year of graduation / passing</label>
+          <input type="number" id="graduation_year" name="graduation_year" min="1950" max="2100" step="1">
+        </div>
+        <div class="field">
+          <label for="qualification_status">Qualification status</label>
+          <select id="qualification_status" name="qualification_status">
+            <option value="">Select</option>
+            <option value="completed">Completed</option>
+            <option value="pursuing">Currently pursuing</option>
+            <option value="appearing">Appearing</option>
+            <option value="result_awaited">Result awaited</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="marks">Marks obtained</label>
+          <input type="number" id="marks" name="marks" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label for="percentage">Percentage</label>
+          <input type="number" id="percentage" name="percentage" min="0" max="100" step="0.01">
+        </div>
+        <div class="field">
+          <label for="cgpa">CGPA / GPA</label>
+          <input type="number" id="cgpa" name="cgpa" min="0" max="10" step="0.01">
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>

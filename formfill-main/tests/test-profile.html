@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FormFriend — Profile Storage Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #fafafa; }
+    h1 { font-family: sans-serif; color: #4361ee; margin-bottom: 16px; }
+    .pass { color: #2e7d32; padding: 4px 8px; }
+    .fail { color: #c62828; padding: 4px 8px; font-weight: bold; }
+    .summary { font-size: 18px; font-weight: bold; padding: 12px; border-bottom: 2px solid #ddd; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Profile Storage Tests</h1>
+  <div id="results"></div>
+
+  <script>
+    // Mock chrome.storage.local for testing outside the extension context.
+    // In real extension context, the real chrome.storage.local is used.
+    (function mockChromeStorage() {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        return; // Real Chrome API available — no mock needed
+      }
+      const storage = {};
+      window.chrome = {
+        storage: {
+          local: {
+            get: function(keys, cb) {
+              const result = {};
+              for (const key of keys) {
+                if (storage[key] !== undefined) {
+                  result[key] = JSON.parse(JSON.stringify(storage[key]));
+                }
+              }
+              cb(result);
+            },
+            set: function(items, cb) {
+              for (const [key, value] of Object.entries(items)) {
+                storage[key] = JSON.parse(JSON.stringify(value));
+              }
+              if (cb) cb();
+            },
+            remove: function(keys, cb) {
+              for (const key of keys) {
+                delete storage[key];
+              }
+              if (cb) cb();
+            }
+          }
+        },
+        runtime: { lastError: null }
+      };
+    })();
+  </script>
+
+  <!-- Load the module under test -->
+  <script src="../src/storage/profileStorage.js"></script>
+
+  <script>
+    let passed = 0, failed = 0;
+    function assert(condition, name) {
+      const div = document.createElement('div');
+      if (condition) {
+        div.className = 'pass';
+        div.textContent = '✓ ' + name;
+        passed++;
+      } else {
+        div.className = 'fail';
+        div.textContent = '✗ ' + name;
+        failed++;
+      }
+      document.getElementById('results').appendChild(div);
+    }
+    function done() {
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.style.color = failed > 0 ? '#c62828' : '#2e7d32';
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      document.getElementById('results').prepend(summary);
+    }
+
+    const P = FormFriendProfile;
+
+    async function runTests() {
+      try {
+        // 1. Empty state
+        let profile = await P.getProfile();
+        assert(profile === null, 'getProfile: returns null when empty');
+
+        // 2. hasProfile when empty
+        let has = await P.hasProfile();
+        assert(has === false, 'hasProfile: returns false when empty');
+
+        // 3. Save profile
+        const testProfile = {
+          fullName: 'Anant Agarwal',
+          email: 'anant@example.com',
+          phone: '+91 9876543210',
+          dateOfBirth: '22/05/2007',
+          college: 'CUSAT'
+        };
+        await P.saveProfile(testProfile);
+        assert(true, 'saveProfile: completed without error');
+
+        // 4. Get profile after save
+        profile = await P.getProfile();
+        assert(profile !== null, 'getProfile: returns object after save');
+        assert(profile.fullName === 'Anant Agarwal', 'getProfile: fullName correct');
+        assert(profile.email === 'anant@example.com', 'getProfile: email correct');
+        assert(profile.phone === '+91 9876543210', 'getProfile: phone correct');
+
+        // 5. hasProfile after save
+        has = await P.hasProfile();
+        assert(has === true, 'hasProfile: returns true after save');
+
+        // 6. Update profile (merge)
+        const merged = await P.updateProfile({ department: 'IT', semester: '6' });
+        assert(merged.fullName === 'Anant Agarwal', 'updateProfile: preserves existing fields');
+        assert(merged.department === 'IT', 'updateProfile: adds new field');
+        assert(merged.semester === '6', 'updateProfile: adds another new field');
+
+        // 7. Verify merge persisted
+        profile = await P.getProfile();
+        assert(profile.fullName === 'Anant Agarwal', 'getProfile after update: old field intact');
+        assert(profile.department === 'IT', 'getProfile after update: new field present');
+
+        // 8. Overwrite via saveProfile
+        await P.saveProfile({ fullName: 'New Name', email: 'new@example.com' });
+        profile = await P.getProfile();
+        assert(profile.fullName === 'New Name', 'saveProfile overwrite: fullName updated');
+        assert(profile.department === undefined, 'saveProfile overwrite: old merged field gone');
+
+        // 9. Delete profile
+        await P.deleteProfile();
+        profile = await P.getProfile();
+        assert(profile === null, 'deleteProfile: profile is null after delete');
+
+        // 10. hasProfile after delete
+        has = await P.hasProfile();
+        assert(has === false, 'hasProfile: returns false after delete');
+
+        // 11. Save with invalid input
+        try {
+          await P.saveProfile(null);
+          assert(false, 'saveProfile(null): should have thrown');
+        } catch (e) {
+          assert(true, 'saveProfile(null): throws error');
+        }
+
+        // 12. Update with invalid input
+        try {
+          await P.updateProfile(null);
+          assert(false, 'updateProfile(null): should have thrown');
+        } catch (e) {
+          assert(true, 'updateProfile(null): throws error');
+        }
+
+      } catch (err) {
+        const div = document.createElement('div');
+        div.className = 'fail';
+        div.textContent = '✗ UNEXPECTED ERROR: ' + err.message;
+        document.getElementById('results').appendChild(div);
+        failed++;
+      }
+
+      done();
+    }
+
+    runTests();
+  </script>
+</body>
+</html>

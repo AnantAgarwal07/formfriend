@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test 13: React Controls</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+  #root { max-width: 500px; padding: 20px; border: 1px solid #ddd; background: white; border-radius: 8px; }
+  div.group { margin-bottom: 15px; }
+  label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; color: #555; }
+  .inline-label { display: inline; font-weight: normal; margin-left: 5px; }
+  select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+  .state-pre { background: #eee; padding: 10px; font-size: 12px; }
+</style>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <h1>Test 13: React Controls</h1>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+    function App() {
+      const [state, setState] = useState({ gender: '', maritalStatus: '', student: false });
+      
+      return (
+        <form onSubmit={e => { e.preventDefault(); alert(JSON.stringify(state)); }}>
+          <div className="group">
+            <label>Gender (Radio)</label>
+            <div>
+              <input type="radio" name="gender" value="Male" checked={state.gender === 'Male'} onChange={e => setState({...state, gender: e.target.value})} /> <span className="inline-label">Male</span>
+              <input type="radio" name="gender" value="Female" checked={state.gender === 'Female'} onChange={e => setState({...state, gender: e.target.value})} /> <span className="inline-label">Female</span>
+            </div>
+          </div>
+          
+          <div className="group">
+            <label>Marital Status (Select)</label>
+            <select name="maritalStatus" value={state.maritalStatus} onChange={e => setState({...state, maritalStatus: e.target.value})}>
+              <option value="">Select...</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+            </select>
+          </div>
+          
+          <div className="group">
+            <input type="checkbox" name="student" checked={state.student} onChange={e => setState({...state, student: e.target.checked})} />
+            <label className="inline-label">I am a student</label>
+          </div>
+          
+          <pre className="state-pre">{JSON.stringify(state, null, 2)}</pre>
+          <button type="submit">Submit</button>
+        </form>
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+{
+  "schemaVersion": 1,
+  "description": "Canonical personal profile data that FormFriend can use to understand and fill common examination and application forms.",
+  "categories": [
+    {
+      "id": "personal",
+      "description": "Basic personal details of the user.",
+      "classes": [
+        {
+          "id": "full_name",
+          "description": "The user's complete legal or commonly used name.",
+          "examples": [
+            "Name",
+            "Full Name",
+            "Full Legal Name",
+            "Applicant Name",
+            "Candidate Name"
+          ]
+        },
+        {
+          "id": "first_name",
+          "description": "The user's first or given name.",
+          "examples": [
+            "First Name",
+            "Given Name",
+            "Forename"
+          ]
+        },
+        {
+          "id": "middle_name",
+          "description": "The user's middle name.",
+          "examples": [
+            "Middle Name"
+          ]
+        },
+        {
+          "id": "last_name",
+          "description": "The user's last name or surname.",
+          "examples": [
+            "Last Name",
+            "Surname",
+            "Family Name"
+          ]
+        },
+        {
+          "id": "date_of_birth",
+          "description": "The user's date of birth.",
+          "examples": [
+            "Date of Birth",
+            "DOB",
+            "Birth Date"
+          ]
+        },
+        {
+          "id": "gender",
+          "description": "The user's gender or sex.",
+          "examples": [
+            "Gender",
+            "Sex"
+          ]
+        },
+        {
+          "id": "nationality",
+          "description": "The user's nationality or citizenship.",
+          "examples": [
+            "Nationality",
+            "Citizenship",
+            "Country of Citizenship"
+          ]
+        },
+        {
+          "id": "place_of_birth",
+          "description": "The user's place of birth.",
+          "examples": [
+            "Place of Birth",
+            "Birth Place",
+            "City of Birth"
+          ]
+        },
+        {
+          "id": "mother_tongue",
+          "description": "The user's mother tongue or native language.",
+          "examples": [
+            "Mother Tongue",
+            "Native Language",
+            "First Language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "description": "Contact details belonging to the user.",
+      "classes": [
+        {
+          "id": "email",
+          "description": "The user's primary email address.",
+          "examples": [
+            "Email",
+            "Email Address",
+            "E-mail",
+            "Email ID"
+          ]
+        },
+        {
+          "id": "phone",
+          "description": "The user's primary phone or mobile number.",
+          "examples": [
+            "Phone",
+            "Phone Number",
+            "Mobile Number",
+            "Contact Number",
+            "Mobile"
+          ]
+        },
+        {
+          "id": "alternate_phone",
+          "description": "The user's alternate phone or mobile number.",
+          "examples": [
+            "Alternate Phone",
+            "Alternate Mobile",
+            "Secondary Contact Number"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "address",
+      "description": "The user's residential or permanent address.",
+      "classes": [
+        {
+          "id": "address_line_1",
+          "description": "The first line of the user's address, such as house number, building, or street.",
+          "examples": [
+            "Address",
+            "Address Line 1",
+            "House Number",
+            "House No.",
+            "Street Address"
+          ]
+        },
+        {
+          "id": "address_line_2",
+          "description": "The second line of the user's address, such as locality, area, or landmark.",
+          "examples": [
+            "Address Line 2",
+            "Locality",
+            "Area",
+            "Landmark"
+          ]
+        },
+        {
+          "id": "city",
+          "description": "The user's city or town.",
+          "examples": [
+            "City",
+            "Town",
+            "City/Town"
+          ]
+        },
+        {
+          "id": "district",
+          "description": "The user's district.",
+          "examples": [
+            "District",
+            "District Name"
+          ]
+        },
+        {
+          "id": "state",
+          "description": "The user's state or union territory.",
+          "examples": [
+            "State",
+            "State/UT",
+            "State of Residence"
+          ]
+        },
+        {
+          "id": "country",
+          "description": "The user's country of residence.",
+          "examples": [
+            "Country",
+            "Country of Residence"
+          ]
+        },
+        {
+          "id": "pincode",
+          "description": "The user's postal or PIN code.",
+          "examples": [
+            "PIN Code",
+            "Pincode",
+            "Postal Code",
+            "ZIP Code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "description": "Basic government identity information that may commonly appear in examination forms.",
+      "classes": [
+        {
+          "id": "aadhaar_number",
+          "description": "The user's Aadhaar number when specifically required.",
+          "examples": [
+            "Aadhaar Number",
+            "Aadhaar No.",
+            "UID Number"
+          ]
+        },
+        {
+          "id": "pan_number",
+          "description": "The user's PAN number when specifically required.",
+          "examples": [
+            "PAN",
+            "PAN Number",
+            "PAN No."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "category",
+      "description": "Social, reservation, and disability-related information about the user.",
+      "classes": [
+        {
+          "id": "category",
+          "description": "The user's applicable reservation or social category.",
+          "examples": [
+            "Category",
+            "Caste Category",
+            "Reservation Category",
+            "Social Category"
+          ]
+        },
+        {
+          "id": "ews",
+          "description": "Whether the user belongs to the Economically Weaker Section category.",
+          "examples": [
+            "EWS",
+            "Are you EWS?",
+            "Economically Weaker Section"
+          ]
+        },
+        {
+          "id": "obc_ncl",
+          "description": "Whether the user belongs to the OBC Non-Creamy Layer category.",
+          "examples": [
+            "OBC-NCL",
+            "OBC Non Creamy Layer",
+            "OBC NCL"
+          ]
+        },
+        {
+          "id": "pwd",
+          "description": "Whether the user qualifies under the PwD category.",
+          "examples": [
+            "PwD",
+            "Person with Disability",
+            "Disability Status"
+          ]
+        },
+        {
+          "id": "disability_type",
+          "description": "The user's disability type when applicable.",
+          "examples": [
+            "Disability Type",
+            "Type of Disability",
+            "Nature of Disability"
+          ]
+        },
+        {
+          "id": "disability_percentage",
+          "description": "The user's disability percentage when applicable.",
+          "examples": [
+            "Disability Percentage",
+            "% Disability",
+            "Percentage of Disability"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "description": "The user's reusable educational background.",
+      "classes": [
+        {
+          "id": "highest_qualification",
+          "description": "The user's highest educational qualification.",
+          "examples": [
+            "Highest Qualification",
+            "Educational Qualification",
+            "Highest Educational Qualification"
+          ]
+        },
+        {
+          "id": "degree",
+          "description": "The user's degree or academic program.",
+          "examples": [
+            "Degree",
+            "Degree Name",
+            "Course",
+            "Program"
+          ]
+        },
+        {
+          "id": "branch",
+          "description": "The user's academic branch, specialization, stream, or discipline.",
+          "examples": [
+            "Branch",
+            "Specialization",
+            "Stream",
+            "Discipline",
+            "Major"
+          ]
+        },
+        {
+          "id": "college",
+          "description": "The user's college or institute.",
+          "examples": [
+            "College",
+            "College Name",
+            "Institute",
+            "Institution"
+          ]
+        },
+        {
+          "id": "university",
+          "description": "The user's university.",
+          "examples": [
+            "University",
+            "University Name",
+            "Affiliating University"
+          ]
+        },
+        {
+          "id": "school",
+          "description": "The user's school.",
+          "examples": [
+            "School",
+            "School Name",
+            "Name of School"
+          ]
+        },
+        {
+          "id": "board",
+          "description": "The educational board associated with the user's schooling.",
+          "examples": [
+            "Board",
+            "Board Name",
+            "Education Board",
+            "Examination Board"
+          ]
+        },
+        {
+          "id": "graduation_year",
+          "description": "The year the user completed or expects to complete their qualification.",
+          "examples": [
+            "Graduation Year",
+            "Year of Graduation",
+            "Year of Passing",
+            "Passing Year"
+          ]
+        },
+        {
+          "id": "percentage",
+          "description": "The user's academic percentage.",
+          "examples": [
+            "Percentage",
+            "Percentage Obtained",
+            "Aggregate Percentage"
+          ]
+        },
+        {
+          "id": "cgpa",
+          "description": "The user's CGPA or GPA.",
+          "examples": [
+            "CGPA",
+            "GPA",
+            "Cumulative GPA"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "family",
+      "description": "Personal information about the user's parents and guardian.",
+      "classes": [
+        {
+          "id": "father_name",
+          "description": "The user's father's name.",
+          "examples": [
+            "Father's Name",
+            "Father Name",
+            "Father's Full Name",
+            "Name of Father"
+          ]
+        },
+        {
+          "id": "father_occupation",
+          "description": "The user's father's occupation or profession.",
+          "examples": [
+            "Father's Occupation",
+            "Father Occupation",
+            "Father's Profession"
+          ]
+        },
+        {
+          "id": "father_phone",
+          "description": "The user's father's phone number when requested.",
+          "examples": [
+            "Father's Phone",
+            "Father's Mobile",
+            "Father Contact Number"
+          ]
+        },
+        {
+          "id": "mother_name",
+          "description": "The user's mother's name.",
+          "examples": [
+            "Mother's Name",
+            "Mother Name",
+            "Mother's Full Name",
+            "Name of Mother"
+          ]
+        },
+        {
+          "id": "mother_occupation",
+          "description": "The user's mother's occupation or profession.",
+          "examples": [
+            "Mother's Occupation",
+            "Mother Occupation",
+            "Mother's Profession"
+          ]
+        },
+        {
+          "id": "mother_phone",
+          "description": "The user's mother's phone number when requested.",
+          "examples": [
+            "Mother's Phone",
+            "Mother's Mobile",
+            "Mother Contact Number"
+          ]
+        }
+      ]
+    }
+  ]
+}

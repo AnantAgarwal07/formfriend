@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test 12: Non-text Controls</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+  h1 { color: #333; font-size: 20px; }
+  form { max-width: 500px; padding: 20px; border: 1px solid #ddd; background: white; border-radius: 8px; }
+  fieldset { margin-bottom: 20px; border: 1px solid #eee; padding: 15px; border-radius: 4px; }
+  legend { font-weight: bold; color: #4361ee; padding: 0 5px; }
+  div.group { margin-bottom: 15px; }
+  label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; color: #555; }
+  .inline-label { display: inline; font-weight: normal; margin-left: 5px; }
+  input[type="text"], input[type="email"], select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+  button { padding: 10px 15px; background: #4361ee; color: white; border: none; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Test 12: Non-text Controls</h1>
+  <form>
+    <fieldset><legend>Applicant Details</legend>
+      <div class="group">
+        <label>Gender (Radio)</label>
+        <div>
+          <input type="radio" id="g_male" name="gender" value="m"> <label class="inline-label" for="g_male">Male</label><br>
+          <input type="radio" id="g_female" name="gender" value="f"> <label class="inline-label" for="g_female">Female</label><br>
+          <input type="radio" id="g_other" name="gender" value="o"> <label class="inline-label" for="g_other">Other</label>
+        </div>
+      </div>
+      <div class="group">
+        <label>Gender (Select)</label>
+        <select name="gender_sel">
+          <option value="">Select...</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="group">
+        <label>Marital Status</label>
+        <div>
+          <input type="radio" name="maritalStatus" value="single"> <span class="inline-label">Single</span><br>
+          <input type="radio" name="maritalStatus" value="married"> <span class="inline-label">Married</span><br>
+          <input type="radio" name="maritalStatus" value="divorced"> <span class="inline-label">Divorced</span>
+        </div>
+      </div>
+      <div class="group">
+        <label>Country</label>
+        <select name="country">
+          <option value="us">United States</option>
+          <option value="in">India</option>
+          <option value="uk">United Kingdom</option>
+        </select>
+      </div>
+      <div class="group">
+        <input type="checkbox" id="chk_student" name="isStudent">
+        <label class="inline-label" for="chk_student">I am a student</label>
+      </div>
+      <div class="group">
+        <input type="checkbox" id="chk_terms" name="terms">
+        <label class="inline-label" for="chk_terms">I agree to the Terms and Conditions</label>
+      </div>
+      <div class="group">
+        <input type="checkbox" id="chk_marketing" name="marketing">
+        <label class="inline-label" for="chk_marketing">I consent to marketing emails</label>
+      </div>
+      
+      <!-- Ambiguous radio group -->
+      <div class="group">
+        <label>Level</label>
+        <div>
+          <input type="radio" name="level" value="1"> <span class="inline-label">1</span>
+          <input type="radio" name="level" value="2"> <span class="inline-label">2</span>
+          <input type="radio" name="level" value="3"> <span class="inline-label">3</span>
+        </div>
+      </div>
+    </fieldset>
+    <button type="submit">Submit Form</button>
+  </form>
+</body>
+</html>

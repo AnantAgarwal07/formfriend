@@ -1,0 +1,100 @@
+{
+  "fields": [
+    {
+      "id": "f1",
+      "label": "name",
+      "placeholder": "Enter your name",
+      "sectionHeading": "Personal Details",
+      "inputType": "text",
+      "expectedClass": "name"
+    },
+    {
+      "id": "f2",
+      "label": "naaaame",
+      "placeholder": "type your naaaame",
+      "sectionHeading": "Personal Details",
+      "inputType": "text",
+      "expectedClass": "name"
+    },
+    {
+      "id": "f3",
+      "label": "Full Legal Name",
+      "placeholder": "",
+      "sectionHeading": "Applicant Information",
+      "inputType": "text",
+      "expectedClass": "name"
+    },
+    {
+      "id": "f4",
+      "label": "gennndderr",
+      "placeholder": "Select your gennndderr",
+      "sectionHeading": "Personal Details",
+      "inputType": "select",
+      "expectedClass": "gender"
+    },
+    {
+      "id": "f5",
+      "label": "Gender",
+      "placeholder": "Select",
+      "sectionHeading": "Personal Details",
+      "inputType": "select",
+      "expectedClass": "gender"
+    },
+    {
+      "id": "f6",
+      "label": "Father's Name",
+      "placeholder": "Enter father's name",
+      "sectionHeading": "Family Details",
+      "inputType": "text",
+      "expectedClass": "none"
+    },
+    {
+      "id": "f7",
+      "label": "Mother's Name",
+      "placeholder": "Enter mother's name",
+      "sectionHeading": "Family Details",
+      "inputType": "text",
+      "expectedClass": "none"
+    },
+    {
+      "id": "f8",
+      "label": "Date of Birth",
+      "placeholder": "DD/MM/YYYY",
+      "sectionHeading": "Personal Details",
+      "inputType": "date",
+      "expectedClass": "dob"
+    },
+    {
+      "id": "f9",
+      "label": "DOB",
+      "placeholder": "",
+      "sectionHeading": "Personal Details",
+      "inputType": "date",
+      "expectedClass": "dob"
+    },
+    {
+      "id": "f10",
+      "label": "E-mail address",
+      "placeholder": "you@example.com",
+      "sectionHeading": "Contact",
+      "inputType": "email",
+      "expectedClass": "email"
+    },
+    {
+      "id": "f11",
+      "label": "phon number",
+      "placeholder": "10 digit mobile",
+      "sectionHeading": "Contact",
+      "inputType": "tel",
+      "expectedClass": "phone"
+    },
+    {
+      "id": "f12",
+      "label": "How old are you?",
+      "placeholder": "",
+      "sectionHeading": "Personal Details",
+      "inputType": "number",
+      "expectedClass": "age"
+    }
+  ]
+}

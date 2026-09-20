@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FormFriend — Autofill Engine Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #fafafa; }
+    h1 { font-family: sans-serif; color: #4361ee; margin-bottom: 16px; }
+    h2 { font-family: sans-serif; color: #333; margin: 16px 0 8px; font-size: 14px; }
+    .pass { color: #2e7d32; padding: 4px 8px; }
+    .fail { color: #c62828; padding: 4px 8px; font-weight: bold; }
+    .summary { font-size: 18px; font-weight: bold; padding: 12px; border-bottom: 2px solid #ddd; margin-bottom: 8px; }
+    .test-form { background: #f0f0f0; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+    .test-form label { display: block; font-size: 12px; margin-bottom: 4px; color: #666; }
+    .test-form input, .test-form select, .test-form textarea { margin-bottom: 8px; display: block; }
+  </style>
+</head>
+<body>
+  <h1>Autofill Engine Tests</h1>
+
+  <!-- Test form elements -->
+  <div class="test-form">
+    <h2>Test Form Elements</h2>
+    <label>Text Input</label>
+    <input type="text" id="test-text">
+
+    <label>Email Input</label>
+    <input type="email" id="test-email">
+
+    <label>Tel Input</label>
+    <input type="tel" id="test-tel">
+
+    <label>Date Input</label>
+    <input type="date" id="test-date">
+
+    <label>Textarea</label>
+    <textarea id="test-textarea"></textarea>
+
+    <label>Select</label>
+    <select id="test-select">
+      <option value="">-- Select --</option>
+      <option value="cusat">CUSAT</option>
+      <option value="iit_delhi">IIT Delhi</option>
+      <option value="nit_calicut">NIT Calicut</option>
+    </select>
+
+    <label>Checkbox</label>
+    <input type="checkbox" id="test-checkbox">
+
+    <label>Radio Group</label>
+    <input type="radio" name="test-radio" value="male" id="test-radio-male"> Male
+    <input type="radio" name="test-radio" value="female" id="test-radio-female"> Female
+    <input type="radio" name="test-radio" value="other" id="test-radio-other"> Other
+  </div>
+
+  <div id="results"></div>
+
+  <!-- Load dependencies -->
+  <script src="../src/utils/normalize.js"></script>
+  <script src="../src/content/fieldRegistry.js"></script>
+  <script src="../src/content/autofill.js"></script>
+
+  <script>
+    let passed = 0, failed = 0;
+    function assert(condition, name) {
+      const div = document.createElement('div');
+      if (condition) {
+        div.className = 'pass';
+        div.textContent = '✓ ' + name;
+        passed++;
+      } else {
+        div.className = 'fail';
+        div.textContent = '✗ ' + name;
+        failed++;
+      }
+      document.getElementById('results').appendChild(div);
+    }
+    function assertEq(actual, expected, name) {
+      const ok = actual === expected;
+      assert(ok, ok ? name : `${name} — expected "${expected}", got "${actual}"`);
+    }
+    function done() {
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.style.color = failed > 0 ? '#c62828' : '#2e7d32';
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      document.getElementById('results').prepend(summary);
+    }
+
+    const A = FormFriendAutofill;
+    const R = FormFriendFieldRegistry;
+
+    // Track event dispatches
+    const eventsFired = {};
+    ['test-text', 'test-email', 'test-tel', 'test-date', 'test-textarea'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => { eventsFired[id] = true; });
+    });
+
+    // Register fields
+    R.registerField('ff_text', document.getElementById('test-text'));
+    R.registerField('ff_email', document.getElementById('test-email'));
+    R.registerField('ff_tel', document.getElementById('test-tel'));
+    R.registerField('ff_date', document.getElementById('test-date'));
+    R.registerField('ff_textarea', document.getElementById('test-textarea'));
+    R.registerField('ff_select', document.getElementById('test-select'));
+    R.registerField('ff_checkbox', document.getElementById('test-checkbox'));
+    R.registerField('ff_radio', document.getElementById('test-radio-male'));
+
+    // --- fillField tests ---
+
+    // Text input
+    let result = A.fillField(document.getElementById('test-text'), 'Anant Agarwal');
+    assert(result.success, 'fillField text: success');
+    assertEq(document.getElementById('test-text').value, 'Anant Agarwal', 'fillField text: value set');
+    assert(eventsFired['test-text'], 'fillField text: input event fired');
+
+    // Email input
+    result = A.fillField(document.getElementById('test-email'), 'anant@example.com');
+    assert(result.success, 'fillField email: success');
+    assertEq(document.getElementById('test-email').value, 'anant@example.com', 'fillField email: value set');
+    assert(eventsFired['test-email'], 'fillField email: input event fired');
+
+    // Tel input
+    result = A.fillField(document.getElementById('test-tel'), '+91 9876543210');
+    assert(result.success, 'fillField tel: success');
+    assertEq(document.getElementById('test-tel').value, '+91 9876543210', 'fillField tel: value set');
+
+    // Date input
+    result = A.fillField(document.getElementById('test-date'), '22/05/2007', 'date');
+    assert(result.success, 'fillField date: success');
+    assertEq(document.getElementById('test-date').value, '2007-05-22', 'fillField date: normalized to ISO');
+
+    // Textarea
+    result = A.fillField(document.getElementById('test-textarea'), 'Some long text here');
+    assert(result.success, 'fillField textarea: success');
+    assertEq(document.getElementById('test-textarea').value, 'Some long text here', 'fillField textarea: value set');
+
+    // Select
+    result = A.fillField(document.getElementById('test-select'), 'CUSAT');
+    assert(result.success, 'fillField select: success');
+    assertEq(document.getElementById('test-select').value, 'cusat', 'fillField select: matched by text');
+
+    // Checkbox
+    result = A.fillField(document.getElementById('test-checkbox'), 'true');
+    assert(result.success, 'fillField checkbox: success');
+    assert(document.getElementById('test-checkbox').checked, 'fillField checkbox: checked');
+
+    // Radio
+    result = A.fillField(document.getElementById('test-radio-male'), 'female', 'radio');
+    assert(result.success, 'fillField radio: success');
+    assert(document.getElementById('test-radio-female').checked, 'fillField radio: correct option checked');
+
+    // Null element
+    result = A.fillField(null, 'test');
+    assert(!result.success, 'fillField null element: returns failure');
+
+    // Null value
+    result = A.fillField(document.getElementById('test-text'), null);
+    assert(!result.success, 'fillField null value: returns failure');
+
+    // --- fillForm tests ---
+
+    // Reset fields
+    document.getElementById('test-text').value = '';
+    document.getElementById('test-email').value = '';
+
+    const mapping = [
+      { fieldId: 'ff_text', profileField: 'fullName', confidence: 0.97 },
+      { fieldId: 'ff_email', profileField: 'email', confidence: 0.99 },
+      { fieldId: 'ff_tel', profileField: 'phone', confidence: 0.95 }
+    ];
+    const profile = {
+      fullName: 'Test User',
+      email: 'test@test.com',
+      phone: '1234567890'
+    };
+
+    const formResult = A.fillForm(mapping, profile);
+    assert(formResult.filled.length === 3, 'fillForm: filled 3 fields');
+    assertEq(document.getElementById('test-text').value, 'Test User', 'fillForm: text field filled');
+    assertEq(document.getElementById('test-email').value, 'test@test.com', 'fillForm: email field filled');
+
+    // Low confidence skip
+    document.getElementById('test-text').value = '';
+    const lowConfMapping = [
+      { fieldId: 'ff_text', profileField: 'fullName', confidence: 0.3 }
+    ];
+    const lowResult = A.fillForm(lowConfMapping, profile);
+    assert(lowResult.skipped.length === 1, 'fillForm: skipped low confidence field');
+    assertEq(document.getElementById('test-text').value, '', 'fillForm: low confidence field not filled');
+
+    // Missing profile field
+    const missingMapping = [
+      { fieldId: 'ff_text', profileField: 'nonExistentField', confidence: 0.99 }
+    ];
+    const missingResult = A.fillForm(missingMapping, profile);
+    assert(missingResult.skipped.length === 1, 'fillForm: skipped missing profile field');
+
+    // Invalid mapping
+    const invalidResult = A.fillForm('not an array', profile);
+    assert(invalidResult.errors.length > 0, 'fillForm: error on invalid mapping');
+
+    // Missing element
+    const badElementMapping = [
+      { fieldId: 'ff_nonexistent', profileField: 'fullName', confidence: 0.99 }
+    ];
+    const badElResult = A.fillForm(badElementMapping, profile);
+    assert(badElResult.errors.length === 1, 'fillForm: error on missing DOM element');
+
+    done();
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormFriend</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="state-no-profile" class="state-view">
+    <div class="ff-logo-section">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <p class="ff-tagline">Set up your profile to get started</p>
+    <button id="btn-create-profile" class="ff-btn ff-btn-primary ff-btn-full">Create Profile</button>
+  </div>
+
+  <div id="state-profile-ready" class="state-view" hidden>
+    <div class="ff-logo-section">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <div class="ff-status-badge success">
+      <span>✓</span> Profile Ready
+    </div>
+    <div class="ff-profile-summary" id="profile-summary"></div>
+    <div class="ff-btn-group">
+      <button id="btn-edit-profile" class="ff-btn ff-btn-secondary ff-btn-full">Edit Profile</button>
+      <button id="btn-scan-form" class="ff-btn ff-btn-primary ff-btn-full">Scan This Page</button>
+    </div>
+  </div>
+
+  <div id="state-scanning" class="state-view" hidden>
+    <div class="ff-logo-section small">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <div class="ff-status-badge scanning">
+      <span class="ff-spinner"></span> Analyzing fields...
+    </div>
+    <p class="ff-subtitle">Form detected on this page</p>
+  </div>
+
+  <div id="state-mapped" class="state-view" hidden>
+    <div class="ff-logo-section small">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <div class="ff-status-badge info">
+      <span id="field-count">0</span> fields identified
+    </div>
+    <button id="btn-review-fill" class="ff-btn ff-btn-primary ff-btn-full">Review & Fill</button>
+  </div>
+
+  <div id="state-filled" class="state-view" hidden>
+    <div class="ff-logo-section small">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <div class="ff-status-badge success">
+      <span>✓</span> Form filled successfully
+    </div>
+    <button id="btn-check-mismatches" class="ff-btn ff-btn-secondary ff-btn-full">Check for Mismatches</button>
+    <button id="btn-reset" class="ff-btn ff-btn-ghost ff-btn-full">Reset</button>
+  </div>
+
+  <div id="state-mismatch" class="state-view" hidden>
+    <div class="ff-logo-section small">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <div class="ff-status-badge warning">
+      ⚠ <span id="mismatch-count">0</span> mismatches detected
+    </div>
+    <button id="btn-review-mismatches" class="ff-btn ff-btn-danger ff-btn-full">Review</button>
+  </div>
+
+  <div id="state-profile-form" class="state-view" hidden>
+    <div class="ff-logo-section small">
+      <span class="ff-emoji">🤝</span>
+      <h1>FormFriend</h1>
+    </div>
+    <form id="profile-form" class="ff-profile-form">
+      
+      <div id="dynamic-schema-form"></div>
+      
+      <div class="ff-btn-group" style="margin-top: 24px;">
+        <button type="button" id="btn-cancel-profile" class="ff-btn ff-btn-secondary">Cancel</button>
+        <button type="submit" class="ff-btn ff-btn-primary">Save Profile</button>
+      </div>
+      <button type="button" id="btn-delete-profile" class="ff-btn ff-btn-ghost ff-btn-full ff-btn-danger-text">
+        Delete Profile
+      </button>
+    </form>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

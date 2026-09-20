@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "formfriend-backend"
+resolve_s3 = true
+s3_prefix = "formfriend-backend"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "CognitoUserPoolId=\"ap-south-1_QfynQysI0\" CognitoClientId=\"63o3uajugsgripd22cj13k62a7\" ProfilesTableName=\"Profiles\" UpstashRedisRestUrl=\"https://star-catfish-286930.upstash.io\" RedisProfileTtlSeconds=\"3600\" CorsOrigin=\"*\" GeminiModel=\"gemini-3.5-flash-lite\""
+image_repositories = []
+
+[default.global.parameters]
+region = "ap-south-1"

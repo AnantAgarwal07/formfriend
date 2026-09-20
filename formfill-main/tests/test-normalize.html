@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FormFriend — Normalization Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #fafafa; }
+    h1 { font-family: sans-serif; color: #4361ee; margin-bottom: 16px; }
+    .pass { color: #2e7d32; padding: 4px 8px; }
+    .fail { color: #c62828; padding: 4px 8px; font-weight: bold; }
+    .summary { font-size: 18px; font-weight: bold; padding: 12px; border-bottom: 2px solid #ddd; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Normalization Tests</h1>
+  <div id="results"></div>
+
+  <!-- Load the module under test -->
+  <script src="../src/utils/normalize.js"></script>
+
+  <script>
+    let passed = 0, failed = 0;
+    function assert(condition, name) {
+      const div = document.createElement('div');
+      if (condition) {
+        div.className = 'pass';
+        div.textContent = '✓ ' + name;
+        passed++;
+      } else {
+        div.className = 'fail';
+        div.textContent = '✗ ' + name;
+        failed++;
+      }
+      document.getElementById('results').appendChild(div);
+    }
+    function assertEq(actual, expected, name) {
+      const ok = actual === expected;
+      assert(ok, ok ? name : `${name} — expected "${expected}", got "${actual}"`);
+    }
+    function done() {
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.style.color = failed > 0 ? '#c62828' : '#2e7d32';
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      document.getElementById('results').prepend(summary);
+    }
+
+    // --- Tests ---
+    const N = FormFriendNormalize;
+
+    // normalizeText
+    assertEq(N.normalizeText(' Hello   World '), 'hello world', 'normalizeText: trim + collapse + lowercase');
+    assertEq(N.normalizeText(''), '', 'normalizeText: empty string');
+    assertEq(N.normalizeText('  '), '', 'normalizeText: whitespace only');
+    assertEq(N.normalizeText('ABC'), 'abc', 'normalizeText: uppercase');
+
+    // normalizeName
+    assertEq(N.normalizeName('  Anant   Agarwal  '), 'anant agarwal', 'normalizeName: whitespace + case');
+    assertEq(N.normalizeName('Mr. Anant Agarwal'), 'anant agarwal', 'normalizeName: strip Mr.');
+    assertEq(N.normalizeName('Dr. Smith'), 'smith', 'normalizeName: strip Dr.');
+    assertEq(N.normalizeName('Mrs. Jane Doe'), 'jane doe', 'normalizeName: strip Mrs.');
+
+    // normalizePhone
+    assertEq(N.normalizePhone('+91 98765 43210'), '919876543210', 'normalizePhone: +91 format');
+    assertEq(N.normalizePhone('(123) 456-7890'), '1234567890', 'normalizePhone: US format');
+    assertEq(N.normalizePhone('9876543210'), '9876543210', 'normalizePhone: plain digits');
+    assertEq(N.normalizePhone(''), '', 'normalizePhone: empty');
+
+    // normalizeEmail
+    assertEq(N.normalizeEmail('  Anant@Example.COM  '), 'anant@example.com', 'normalizeEmail: trim + lowercase');
+    assertEq(N.normalizeEmail('test@test.com'), 'test@test.com', 'normalizeEmail: already normalized');
+
+    // normalizeDate
+    assertEq(N.normalizeDate('22/05/2007'), '2007-05-22', 'normalizeDate: DD/MM/YYYY');
+    assertEq(N.normalizeDate('22-05-2007'), '2007-05-22', 'normalizeDate: DD-MM-YYYY');
+    assertEq(N.normalizeDate('2007-05-22'), '2007-05-22', 'normalizeDate: YYYY-MM-DD (ISO)');
+    assertEq(N.normalizeDate('2007/05/22'), '2007-05-22', 'normalizeDate: YYYY/MM/DD');
+    assertEq(N.normalizeDate('invalid'), null, 'normalizeDate: invalid returns null');
+    assertEq(N.normalizeDate(''), null, 'normalizeDate: empty returns null');
+
+    // levenshteinDistance
+    assertEq(N.levenshteinDistance('kitten', 'sitting'), 3, 'levenshtein: kitten → sitting = 3');
+    assertEq(N.levenshteinDistance('', 'abc'), 3, 'levenshtein: empty → abc = 3');
+    assertEq(N.levenshteinDistance('abc', 'abc'), 0, 'levenshtein: identical = 0');
+    assertEq(N.levenshteinDistance('Agarwal', 'Aggarwal'), 1, 'levenshtein: Agarwal → Aggarwal = 1');
+
+    // similarity
+    assertEq(N.similarity('Anant Agarwal', 'Anant Agarwal'), 1, 'similarity: identical = 1');
+    assert(N.similarity('Agarwal', 'Aggarwal') > 0.8, 'similarity: Agarwal/Aggarwal > 0.8');
+    assert(N.similarity('abc', 'xyz') < 0.5, 'similarity: abc/xyz < 0.5');
+
+    // getNormalizer
+    assert(N.getNormalizer('fullName') === N.normalizeName, 'getNormalizer: fullName → normalizeName');
+    assert(N.getNormalizer('email') === N.normalizeEmail, 'getNormalizer: email → normalizeEmail');
+    assert(N.getNormalizer('phone') === N.normalizePhone, 'getNormalizer: phone → normalizePhone');
+    assert(N.getNormalizer('dateOfBirth') === N.normalizeDate, 'getNormalizer: dateOfBirth → normalizeDate');
+    assert(N.getNormalizer('college') === N.normalizeText, 'getNormalizer: college → normalizeText');
+
+    done();
+  </script>
+</body>
+</html>

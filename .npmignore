@@ -1,0 +1,12 @@
+formfill-main/
+formfriend-clientside-crypto-main/
+Formfriend-llm-fallback-main/
+tests/
+postman/
+test-html-mappings.js
+update-postman.js
+samconfig.toml
+template.yaml
+README.md
+.samignore
+.env*

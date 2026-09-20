@@ -31,24 +31,63 @@
     }
   }
 
-  function getProfile() {
+    function getProfile() {
     return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
-        resolve(result[STORAGE_KEY] || null);
+      chrome.storage.local.get([STORAGE_KEY], (res) => {
+        resolve(res[STORAGE_KEY] || null);
       });
     });
   }
+  // --- E2E ENCRYPTION CLOUD SYNC ---
+  const DEMO_USER_ID = 'demo-user-123';
+  const API_URL = 'http://localhost:3000'; 
+  const DEMO_TOKEN = 'DEMO_TOKEN';
+  let pendingCloudBundle = null;
 
-  function saveProfile(profile) {
+  async function saveProfile(profile, passphrase) {
+    // 1. Encrypt & create cloud bundle
+    const bundle = await window.FormFriendCrypto.createAndSaveProfile({
+      userId: DEMO_USER_ID,
+      profile,
+      passphrase
+    });
+    
+    // 2. Upload to Cloud
+    await fetch(+ '' + ${API_URL}/profile + '' + , {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': + '' + Bearer  + '' + 
+      },
+      body: JSON.stringify(bundle)
+    });
+
+    // 3. Save plaintext to local storage for quick access by content scripts
     return new Promise((resolve) => {
       chrome.storage.local.set({ [STORAGE_KEY]: profile }, resolve);
     });
   }
 
-  function deleteProfile() {
+  async function deleteProfile() {
+    await window.FormFriendCrypto.clearDeviceKey(DEMO_USER_ID);
     return new Promise((resolve) => {
       chrome.storage.local.remove([STORAGE_KEY], resolve);
     });
+  }
+  
+  async function checkCloudProfile() {
+    try {
+      const res = await fetch(+ '' + ${API_URL}/profile + '' + , {
+        headers: { 'Authorization': + '' + Bearer  + '' +  }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.cloudBundle;
+      }
+    } catch (e) {
+      console.warn('Cloud sync failed:', e);
+    }
+    return null;
   }
 
   function renderProfileSummary(profile) {
@@ -459,6 +498,13 @@
     const profile = await getProfile();
 
     if (!profile) {
+      // Check cloud!
+      const cloudBundle = await checkCloudProfile();
+      if (cloudBundle) {
+        pendingCloudBundle = cloudBundle;
+        showView('unlock');
+        return;
+      }
       showView('noProfile');
       return;
     }
@@ -513,13 +559,40 @@
   profileFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     const profile = readForm();
+    const passphrase = document.getElementById('profile-passphrase').value;
+    if (!passphrase) {
+      alert('Master Passphrase is required for E2E encryption!');
+      return;
+    }
     if (!profile.firstName || !profile.lastName || !profile['contact.email']) {
       alert('First Name, Last Name, and email are required.');
       return;
     }
-    await saveProfile(profile);
+    await saveProfile(profile, passphrase);
     renderProfileSummary(profile);
     showView('profileReady');
+  });
+
+  document.getElementById('btn-unlock-profile').addEventListener('click', async () => {
+    const passphrase = document.getElementById('unlock-passphrase').value;
+    if (!passphrase) { alert('Passphrase is required'); return; }
+    try {
+      const profile = await window.FormFriendCrypto.recoverOnNewDevice({
+        userId: DEMO_USER_ID,
+        cloudBundle: pendingCloudBundle,
+        passphrase
+      });
+      // Save decrypted profile locally
+      await new Promise((resolve) => chrome.storage.local.set({ [STORAGE_KEY]: profile }, resolve));
+      renderProfileSummary(profile);
+      showView('profileReady');
+    } catch (e) {
+      alert('Failed to decrypt: ' + e.message);
+    }
+  });
+
+  document.getElementById('btn-unlock-cancel').addEventListener('click', async () => {
+    showView('noProfile');
   });
 
   document.getElementById('btn-delete-profile').addEventListener('click', async () => {
@@ -588,3 +661,5 @@
 
   init();
 })();
+
+

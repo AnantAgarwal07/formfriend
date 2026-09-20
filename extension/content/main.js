@@ -338,8 +338,8 @@ var FormFriendMain = (function () {
         }
       } else {
         // Third-party Information Flow (Father, Mother, Guardian, Emergency Contact)
-        // First attempt to resolve from user's saved family profile!
-        value = getProfileValue(profile, entry.profileField, element);
+        const thirdPartyField = person + '_' + entry.profileField;
+        value = profile[thirdPartyField];
 
         // If not in profile, only prompt if required
         if (!value) {
@@ -348,12 +348,14 @@ var FormFriendMain = (function () {
             continue;
           }
 
-          const result = await FormFriendReviewUI.showMissingInfoPrompt(label, `${person}'s information`, true);
+          const result = await FormFriendReviewUI.showMissingInfoPrompt(label, person + '\\''s information', true);
           if (result.action === 'skip') continue;
           value = result.value;
           if (result.action === 'save' && value) {
-            profile[entry.profileField] = value;
-            await FormFriendProfile.updateProfile({ [entry.profileField]: value });
+            profile[thirdPartyField] = value;
+            await FormFriendProfile.updateProfile({ [thirdPartyField]: value });
+          }
+        });
           }
         }
       }
@@ -432,3 +434,5 @@ var FormFriendMain = (function () {
     getFields: () => currentFields
   };
 })();
+
+

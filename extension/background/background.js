@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             try {
               // Ensure FormFriendAPI is accessible in background (needs importScripts in manifest)
               // If not, this logic can just use fetch directly or rely on api.js being loaded
-              const apiResponse = await fetch(`http://localhost:3000/intelligence/resolve`, {
+              const apiResponse = await fetch(`http://wp79o986m5.execute-api.ap-south-1.amazonaws.com/intelligence/resolve`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
